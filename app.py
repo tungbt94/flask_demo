@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from flask import json
+from flask import request
 
 app = Flask(__name__)
 
@@ -21,9 +21,20 @@ def hello_world():
                     'class': 'Android gen 5'})
 
 
-@app.route('/posts', methods=['GET'])
+@app.route('/posts', methods=['GET', 'POST'])
 def all_post():
-    return json.dumps(posts)
+    if request.method == 'GET':
+        return jsonify(posts=[post.serialize for post in posts])
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        new_post = {
+            'title': title,
+            'content': content
+        }
+        posts.append(new_post)
+        return jsonify(new_post)
 
 
 @app.route('/posts/<int:id>')

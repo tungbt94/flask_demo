@@ -22,5 +22,5 @@ class Post(Base):
         }
 
 
-engine = create_engine('')
+engine = create_engine('sqlite:///tumblebog.db')
 Base.metadata.create_all(engine)
