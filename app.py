@@ -1,17 +1,17 @@
 from flask import Flask, jsonify
 from flask import request
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from models import Base, Post
+
+engine = create_engine('sqlite:///tumblebog.db')
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
 
 app = Flask(__name__)
-
-post1 = {
-    'title': 'Good day',
-    'content': 'No content. OK?'
-}
-post2 = {
-    'title': 'Bad day',
-    'content': 'Nothing'
-}
-posts = [post1, post2]
 
 
 @app.route('/')
@@ -24,25 +24,23 @@ def hello_world():
 @app.route('/posts', methods=['GET', 'POST'])
 def all_post():
     if request.method == 'GET':
+        posts = session.query(Post).all()
         return jsonify(posts=[post.serialize for post in posts])
 
     if request.method == 'POST':
         title = request.form.get('title')
         content = request.form.get('content')
-        new_post = {
-            'title': title,
-            'content': content
-        }
-        posts.append(new_post)
-        return jsonify(new_post)
+        post = Post(title=title,content=content)
+        session.add(post)
+        session.commit()
+        return jsonify(post.serialize)
 
 
 @app.route('/posts/<int:id>')
 def post_hanle():
-    if id == 1:
-        return json.dumps(post1)
-    if id == 2:
-        return json.dumps(post2)
+    post = session.query(Post).filter_by(id=id).first()
+    return jsonify(post.serialize)
+
 
 if __name__ == '__main__':
     app.debug = True
