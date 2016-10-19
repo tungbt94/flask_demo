@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    print('Hello gen5!')
+    print({'name': 'Tung','class': 'Android gen 5'})
     return jsonify({'name': 'Tung',
                     'class': 'Android gen 5'})
 
